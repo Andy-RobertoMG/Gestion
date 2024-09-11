@@ -1,9 +1,67 @@
-﻿@page "/"
-
-<PageTitle>Index</PageTitle>
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+﻿@page "/" 
+<PageTitle>Gestion de Mestass</PageTitle> 
+<section class="layout-body">
+    <div class="top bg-white d-flex p-2 border-left-green ">
+        <p class="align-self-center m-0">Control de Metass</p>
+    </div>
+    <div class="left bg-white p-2">
+        <button class="btn text-white d-flex bg-deep-space-sparkle">
+            <span class="oi oi-plus align-self-center h5  me-1"></span>
+            <p class="m-0 align-self-center">Nueva meta</p>
+        </button>
+    </div>
+    <div class="right bg-white">
+        <div class="w-100 bg-deep-space-sparkle ps-2 pt-2 pb-2">
+            <p class="text-white fw-bold align-self-center m-0">Configurar plan de compensación</p>  
+        </div>
+        <div class="m-3">
+            <div class="border-green border-bottom-0 p-2">
+                <button class="btn text-white d-flex bg-deep-space-sparkle">
+                    <span class="oi oi-plus m-0 align-self-center me-1"></span>
+                    <p class="m-0 align-self-center">Agregar tarea</p>
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table alternate-rows table-body-color table-bordered m-0">
+                    <thead class="table-light table-head-border-color ">
+                        <tr class="header-color header-body">
+                            <th scope="col"><input type="checkbox"></th>
+                            <th></th>
+                            <th scope="col">Tarea <input type="text" class="form-control form-control-sm mt-1" placeholder=""></th>
+                            <th scope="col">Fecha <input type="datetime" class="form-control form-control-sm mt-1" ></th>
+                            <th scope="col">Estado <input type="text" class="form-control form-control-sm mt-1" placeholder=""></th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbody-border-color">
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td><i class="bi bi-star-fill star-icon"></i></td>
+                            <td> Tarea 1</td>
+                            <td>20/07/2022</td>
+                            <td class="status-completed">Completada</td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td><i class="bi bi-star star-icon-gray"></i></td>
+                            <td> Tarea 2</td>
+                            <td>20/07/2022</td>
+                            <td class="status-open">Abierta</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between border-green border-top-0 ps-1 pe-1 ">
+                <div class="fs-5 gap-1 d-flex align-content-center ">
+                    <i class="bi bi-skip-start-fill d-flex align-items-center"></i>
+                    <i class="bi bi-caret-left-fill d-flex align-items-center"></i>
+                    <div class="bg-deep-space-sparkle text-white d-flex justify-content-center align-items-center" style="width:2rem;height:2rem;">
+                        1
+                    </div>
+                    <i class="bi bi-caret-right-fill d-flex align-items-center"></i>
+                    <i class="bi bi-skip-end-fill d-flex align-items-center"></i>
+                </div>
+                <div class="d-flex align-items-center me-3">1-2 de 2 registros</div>
+            </div>
+        </div>
+    </div>
+</section>
