@@ -1,9 +1,8 @@
 .layout {
     width: 100%;
-    height:100vh;
+    height: 100vh;
     display: grid;
-    grid: "header header" 4rem 
-          "sidebar body" 1fr / 240px 1fr;
+    grid: "header header" 4rem "sidebar body" 1fr / 350px 1fr;
 }
 
 .header {
@@ -17,3 +16,4 @@
 .body {
     grid-area: body;
 }
+/*Scaffold-DbContext "Server=DESKTOP-1USG4GQ; DataBase=Gestion;TrustServerCertificate=true; Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutPutDir Data\GestionModels -ContextDir Data*/

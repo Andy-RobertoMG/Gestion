@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.ResponseCompression;
-
+using Gestion.Server.Services;
+using Gestion.Server.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-
+builder.Services.AddSqlServer<GestionContext>(builder.Configuration.GetConnectionString("GestionConnection"));
+builder.Services.AddScoped<GoalService>();
+builder.Services.AddScoped<AssignmentService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

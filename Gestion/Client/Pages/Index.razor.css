@@ -1,9 +1,8 @@
 ﻿.layout-body {
     width: 100%;
-    flex-grow:1;
+    height: 100vh;
     display: grid;
-    grid: "top top" 3rem 
-          "left right" 1fr / 25rem 1fr;
+    grid: "top top" 3rem "left right" 1fr / 3fr 8fr;
     gap: 11px;
 }
 
@@ -70,4 +69,11 @@
 
 .star-icon-gray {
     color: gray;
+}
+.goal-item:nth-child(odd) {
+    background-color: transparent; /* No background color */
+}
+
+.goal-item:nth-child(even) {
+    background-color: var(--platinum); /* bg-platinum */
 }

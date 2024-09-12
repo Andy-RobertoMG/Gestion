@@ -1,0 +1,80 @@
+﻿@inject HttpClient Http
+<div class="modal fade  show @(showModal?"show d-block":"")" id="goalCreate" tabindex="-1" aria-labelledby="goalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-deep-space-sparkle text-white d-flex justify-content-between">
+                <h1 class="modal-title fw-bolder fs-5" id="exampleModalLabel">Agregar nueva meta</h1>
+                <div>
+                    <i class="fs-3 fw-bolder bi bi-x" @onclick=CloseModal></i>
+                </div>
+            </div>
+            <EditForm Model="Goal" OnValidSubmit="SaveData">
+                <div class="modal-body">
+                    <DataAnnotationsValidator></DataAnnotationsValidator>
+                    <div class="d-flex align-items-center gap-2">
+                        <label>Nombre:</label>
+                        <InputText @bind-Value="Goal.GoalName" class="form-control"></InputText>
+                    </div>
+                    <ValidationMessage For="@(() => Goal.GoalName)" />
+                    @if (error)
+                    {
+                        <p class="m-0 validation-message">@mensaje</p>
+                    }
+                </div>
+                <div class="d-flex justify-content-center gap-2 pt-4 pb-4">
+                    <button type="submit" class="btn bg-deep-space-sparkle text-white">Aceptar</button>
+                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" @onclick=CloseModal>Cerrar</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+@if (showModal)
+{
+    <div class="modal-backdrop-modified fade show"></div>
+}
+
+@code {
+    bool showModal = false, error = false; 
+    string mensaje;
+    GoalUpdateDTO Goal = new();
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+    private async Task SaveData()
+    {
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync<GoalUpdateDTO>("api/Goals", Goal);
+
+            if (response.IsSuccessStatusCode)
+            {
+                mensaje = "Usuario guardado exitosamente.";
+                error = false;
+                showModal = false;
+                Goal = new();
+                await OnSave.InvokeAsync();
+            }
+            else
+            {
+                error = true;
+                mensaje = await response.Content.ReadAsStringAsync();
+
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+    public void ShowModal()
+    {
+        showModal = true;
+        StateHasChanged();
+    }
+    private void CloseModal()
+    {
+        showModal = false;
+        error = false;
+    }
+}

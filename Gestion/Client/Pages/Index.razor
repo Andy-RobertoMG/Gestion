@@ -1,24 +1,52 @@
 ﻿@page "/" 
+@inject HttpClient Http
 <PageTitle>Gestion de Mestass</PageTitle> 
 <section class="layout-body">
     <div class="top bg-white d-flex p-2 border-left-green ">
         <p class="align-self-center m-0">Control de Metass</p>
     </div>
-    <div class="left bg-white p-2">
-        <button class="btn text-white d-flex bg-deep-space-sparkle">
+    <div class="left bg-white  p-2" style=" overflow-y: auto;">
+        <button class="btn text-white d-flex bg-deep-space-sparkle mb-4" @onclick=ShowNewGoalModal>
             <span class="oi oi-plus align-self-center h5  me-1"></span>
             <p class="m-0 align-self-center">Nueva meta</p>
         </button>
+
+        @foreach (var goal in goalDTO)
+        {
+            <div class="w-100 goal-item p-1 d-flex " @onclick=@(()=>SelectGoal(goal))>
+                <div class="col-9">
+                    <p class="fw-bold">@goal.GoalName</p>
+                    <p>Fecha creada: @goal.CreatedDate.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="col-3 d-flex gap-2 justify-content-end">
+                    <span class="fs-4 bi bi-pencil-fill text-black-50" @onclick="@(()=>SelectUpdateGoal(goal.GoalId,goal.GoalName))"></span>
+                    <i class="fs-4 bi bi-trash-fill text-black-50" @onclick="@(()=>SelectDeleteGoal(goal.GoalId,goal.GoalName))"></i>
+                </div>
+
+            </div>
+        }
     </div>
     <div class="right bg-white">
         <div class="w-100 bg-deep-space-sparkle ps-2 pt-2 pb-2">
-            <p class="text-white fw-bold align-self-center m-0">Configurar plan de compensación</p>  
+            <p class="text-white fw-bold align-self-center m-0" style="min-height:1rem;">@goalSelected.GoalName</p>  
         </div>
         <div class="m-3">
-            <div class="border-green border-bottom-0 p-2">
-                <button class="btn text-white d-flex bg-deep-space-sparkle">
+            <div class="border-green border-bottom-0 p-2 gap-2 d-flex justify-content-start">
+                <button class="btn text-white d-flex bg-deep-space-sparkle" @onclick="SelectNewAssigment">
                     <span class="oi oi-plus m-0 align-self-center me-1"></span>
                     <p class="m-0 align-self-center">Agregar tarea</p>
+                </button>
+                <button class="btn text-white d-flex bg-deep-space-sparkle">
+                    <span class="fs-4 bi bi-check-circle m-0 align-self-center me-1"></span>
+                    <p class="m-0 align-self-center">Completar tarea</p>
+                </button>
+                <button class="btn text-white d-flex bg-deep-space-sparkle">
+                    <span class="fs-4 bi bi-pencil-fill m-0 align-self-center me-1"></span>
+                    <p class="m-0 align-self-center">Editar</p>
+                </button>
+                <button class="btn text-white d-flex bg-deep-space-sparkle">
+                    <span class="fs-4 bi bi-trash-fill m-0 align-self-center me-1"></span>
+                    <p class="m-0 align-self-center">Eliminar</p>
                 </button>
             </div>
             <div class="table-responsive">
@@ -33,20 +61,17 @@
                         </tr>
                     </thead>
                     <tbody class="tbody-border-color">
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td><i class="bi bi-star-fill star-icon"></i></td>
-                            <td> Tarea 1</td>
-                            <td>20/07/2022</td>
-                            <td class="status-completed">Completada</td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td><i class="bi bi-star star-icon-gray"></i></td>
-                            <td> Tarea 2</td>
-                            <td>20/07/2022</td>
-                            <td class="status-open">Abierta</td>
-                        </tr>
+                        @foreach (var assigment in assigmentDTO)
+                        {
+                            <tr>
+                                <td><input type="checkbox" value="(@(idSelAssigment.Contains(assigment.AssignmentId))" ></td>
+                                <td><i class="bi bi-star star-icon-gray"></i></td>
+                                <td> @assigment.AssignmentName</td>
+                                <td>@assigment.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                <td class="status-open">@assigment.AssignmentStatus</td>
+                            </tr>
+                        } 
+                        
                     </tbody>
                 </table>
             </div>
@@ -65,3 +90,73 @@
         </div>
     </div>
 </section>
+<NewGoalModal @ref="newGoalModal" OnSave="LoadGoalData"/>
+<UpdateGoalModal @ref="updateGoalModal"  OnSave="LoadGoalData"/>
+<DeleteGoalModal @ref="deleteGoalModal" OnSave="LoadGoalData"/>
+<AssigmentNewModal @ref="assigmentNewModal" OnSave="LoadGoalAssignment" />
+@code{
+    NewGoalModal newGoalModal = new();
+    UpdateGoalModal updateGoalModal = new();
+    DeleteGoalModal deleteGoalModal = new();
+    AssigmentNewModal assigmentNewModal = new();
+    GoalDTO goalSelected = new();
+    List<GoalDTO> goalDTO = new();
+    List<AssignmentDTO> assigmentDTO = new();
+    bool showBackDrop = false,showModifyModal =false,errorUpdate= false;
+    GoalUpdateDTO selectedGoal = new();
+
+    int idSel = 0;
+    List<int> idSelAssigment = new();
+    string mensaje = "";
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadGoalData();
+    }
+    private async Task LoadGoalData()
+    {
+        var response = await Http.GetAsync("api/Goals");
+        if (response.IsSuccessStatusCode)
+        {
+            goalDTO = await response.Content.ReadFromJsonAsync<List<GoalDTO>>() ?? new();
+        }
+    } 
+    private async Task LoadAssigmentData(int id)
+    {
+        var response = await Http.GetAsync($"api/Assignments/byGoal/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            assigmentDTO = await response.Content.ReadFromJsonAsync<List<AssignmentDTO>>() ?? new();
+        }
+    }
+    private async Task LoadGoalAssignment()
+    {
+        var loadGoalsTask = LoadGoalData();  
+        var loadAssignmentsTask = LoadAssigmentData(goalSelected.GoalId);   
+        await Task.WhenAll(loadGoalsTask, loadAssignmentsTask); 
+    }
+    private void ShowNewGoalModal(){
+        newGoalModal.ShowModal();
+    }
+    private void SelectUpdateGoal(int id,string name)
+    {
+        updateGoalModal.ShowModal(id,name);
+    }
+    private void SelectDeleteGoal(int id,string name)
+    {
+        deleteGoalModal.ShowModal(id, name);
+    }
+    private void SelectNewAssigment()
+    {
+        assigmentNewModal.ShowModal();
+    }
+    private async Task SelectGoal(GoalDTO goal){
+        try
+        {
+            goalSelected = goal;
+            await LoadAssigmentData(goalSelected.GoalId);
+        }catch(Exception ex)
+        {
+            
+        }
+    }
+}

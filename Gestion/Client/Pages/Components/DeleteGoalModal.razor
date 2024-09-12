@@ -1,0 +1,68 @@
+﻿@inject HttpClient Http
+<div class="modal fade  show @(showModal?"show d-block":"")" id="goalCreate" tabindex="-1" aria-labelledby="goalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered pb-4 pt-4">
+        <div class="modal-content ">
+            <div class="d-flex flex-column justify-content-center mt-4 w-100">
+                <h3 class="text-secondary fw-bold text-center">¿Está seguro?</h3>
+                <p class="text-center">Que desea eliminar el elemento @goalName</p>
+            </div> 
+            <div class="d-flex justify-content-center gap-2 pt-2 pb-4">
+                <button type="submit" class="btn bg-deep-space-sparkle text-white" @onclick="DeleteData">Aceptar</button>
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" @onclick=CloseModal>Cancelar</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+@if (showModal)
+{
+    <div class="modal-backdrop-modified fade show"></div>
+}
+
+@code {
+    bool showModal = false, error = false;
+    string mensaje = string.Empty;
+    private string goalName = string.Empty;
+    private int id = new();
+
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+
+    private async Task DeleteData()
+    {
+
+        try
+        {
+            var response = await Http.DeleteAsync($"api/Goals/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                mensaje = "Usuario guardado exitosamente.";
+                error = false;
+                showModal = false; 
+                await OnSave.InvokeAsync();
+            }
+            else
+            {
+                error = true;
+                mensaje = await response.Content.ReadAsStringAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+    public void ShowModal(int idSelected, string goalSelected)
+    {
+        goalName = goalSelected;
+        id = idSelected;
+        showModal = true;
+        StateHasChanged();
+    }
+    private void CloseModal()
+    {
+        showModal = false;
+        goalName = string.Empty;
+    }
+}

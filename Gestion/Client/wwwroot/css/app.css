@@ -1,9 +1,16 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
-
+:root {
+    --platinum: #E4E4E4;
+}
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
-
+.app{
+    height:100%;
+}
+html,body {
+    height: 100vh;
+}
 h1:focus {
     outline: none;
 }
@@ -109,4 +116,14 @@ a, .btn-link {
 }
 .bg-opal {
     background-color: #B0C4C4;
+}
+.modal-backdrop-modified {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(128, 128, 128);
+    background-color: rgba(128, 128, 128, .6); /* Cambia el valor de 0.3 para ajustar la opacidad */
 }
