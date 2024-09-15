@@ -44,6 +44,11 @@
     { 
         try
         {
+            if (assignment.GoalId == 0)
+            {
+                toast.ShowWarning("Se debe seleccionar una meta");
+                return;
+            }
             var response = await Http.PostAsJsonAsync<AssigmentUpdateDTO>("api/Assignments", assignment);
 
             if (response.IsSuccessStatusCode)
