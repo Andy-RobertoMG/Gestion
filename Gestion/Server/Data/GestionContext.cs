@@ -26,13 +26,16 @@ public partial class GestionContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Goal>()
+        .Property(g => g.Percentage)
+        .HasPrecision(5, 2);
         modelBuilder.Entity<Assignment>(entity =>
         {
             entity.HasKey(e => e.AssignmentId).HasName("PK__Assignme__32499E77B8AF2C1B");
 
-            entity.Property(e => e.Assignment1)
+            entity.Property(e => e.AssigmentName)
                 .HasMaxLength(80)
-                .HasColumnName("Assignment");
+                .HasColumnName("Name");
             entity.Property(e => e.AssignmentStatus).HasMaxLength(10);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")

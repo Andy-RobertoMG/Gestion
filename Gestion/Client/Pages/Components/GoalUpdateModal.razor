@@ -13,9 +13,9 @@
                     <DataAnnotationsValidator></DataAnnotationsValidator>
                     <div class="d-flex align-items-center gap-2">
                         <label>Nombre:</label>
-                        <InputText @bind-Value="goal.GoalName" class="form-control"></InputText>
+                        <InputText @bind-Value="goal.Name" class="form-control"></InputText>
                     </div>
-                    <ValidationMessage For="@(() => goal.GoalName)" />
+                    <ValidationMessage For="@(() => goal.Name)" />
                     @if (error)
                     {
                         <p class="m-0 validation-message">@mensaje</p>
@@ -23,7 +23,7 @@
                 </div>
                 <div class="d-flex justify-content-center gap-2 pt-4 pb-4">
                     <button type="submit" class="btn bg-deep-space-sparkle text-white">Aceptar</button>
-                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" @onclick=CloseModal>Cancelar</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" @onclick=CloseModal>Cancelar</button>
                 </div>
             </EditForm>
         </div>
@@ -51,29 +51,33 @@
             var response = await Http.PutAsJsonAsync<GoalUpdateDTO>($"api/Goals/{id}", goal);
 
             if (response.IsSuccessStatusCode)
-            {
-                mensaje = "Usuario guardado exitosamente.";
+            { 
                 error = false;
                 showModal = false;
                 goal = new();
                 await OnSave.InvokeAsync();
+                toast.ShowSuccess("Meta actualizada exitosamente.");
             }
             else
             {
                 error = true;
-                mensaje = await response.Content.ReadAsStringAsync(); 
+                mensaje = await response.Content.ReadAsStringAsync();
+                if (!mensaje.Contains("El nombre no está disponible"))
+                {
+                    toast.ShowWarning($"Razon:{response.ReasonPhrase}.Codigo de Estado:{response.StatusCode}.{mensaje}");
+                }
             }
         }
         catch (Exception ex)
         {
-
+            toast.ShowError($"Error:{ex.Message}.{ex.InnerException}");
         }
     }
     public void ShowModal(int idSelected,string goalSelected )
     {
         goal = new()
         {
-            GoalName=goalSelected
+            Name=goalSelected
         };
         id = idSelected;
         showModal = true;

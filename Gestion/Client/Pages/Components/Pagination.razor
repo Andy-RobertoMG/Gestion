@@ -1,0 +1,74 @@
+﻿<div class="fs-5 gap-1 d-flex align-content-center ">
+    <i class="bi bi-skip-start-fill d-flex align-items-center" @onclick=@FirstPage></i>
+    <i class="bi bi-caret-left-fill d-flex align-items-center" @onclick=@ChangeBackPage></i>
+    <div class="bg-deep-space-sparkle text-white d-flex justify-content-center align-items-center" style="width:2rem;height:2rem;">
+        @ActualPage
+    </div>
+    <i class="bi bi-caret-right-fill d-flex align-items-center" @onclick=@ChangeNextPage></i>
+    <i class="bi bi-skip-end-fill d-flex align-items-center" @onclick=@LastPage></i>
+</div>
+<div class="d-flex align-items-center me-3">@FirstRow-@LastRow de @TotalItems registros</div>
+
+@code {
+    [Parameter]
+    public int ActualPage { get; set; } = 1;
+    [Parameter]
+    public int TotalsPage { get; set; } = 0;
+    [Parameter]
+    public int Take { get; set; } = 0;
+    [Parameter] 
+    public EventCallback<int> PaginaSeleccionada { get; set; }
+    [Parameter]
+    public int TotalItems { get; set; } = 0;
+    private int LastRow {
+        get
+        {
+            int lastRow = ActualPage * Take; 
+            return lastRow > TotalItems ? TotalItems : lastRow;
+        } 
+    }
+    private int FirstRow
+    {
+        get
+        {
+            if (TotalItems == 0)
+            {
+                return 0;
+            }
+            // El primer registro de la página actual es el (número de página - 1) por los registros por página, más 1
+            return (ActualPage - 1) * Take + 1;
+        }
+    }
+    private async Task ChangeNextPage()
+    {
+        if (ActualPage + 1 <= TotalsPage)
+        {
+            ActualPage++;
+            await PaginaSeleccionada.InvokeAsync(ActualPage);
+        } 
+    }
+    private async Task ChangeBackPage()
+    {
+        if (ActualPage - 1 >= 1)
+        {
+            ActualPage--; 
+            await PaginaSeleccionada.InvokeAsync(ActualPage);
+        }
+    }
+    private async Task LastPage()
+    {
+        if (ActualPage != TotalsPage)
+        {
+            ActualPage = TotalsPage;
+            await PaginaSeleccionada.InvokeAsync(ActualPage);
+        }
+    }
+    private async Task FirstPage()
+    {
+        if (ActualPage != 1)
+        {
+            ActualPage = 1;
+            await PaginaSeleccionada.InvokeAsync(ActualPage);
+        }
+    }
+}

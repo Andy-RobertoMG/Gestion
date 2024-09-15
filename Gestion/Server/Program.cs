@@ -1,13 +1,16 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using Gestion.Server.Services;
 using Gestion.Server.Data;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-builder.Services.AddSqlServer<GestionContext>(builder.Configuration.GetConnectionString("GestionConnection"));
+//builder.Services.AddSqlServer<GestionContext>(builder.Configuration.GetConnectionString("GestionConnection")); 
+builder.Services.AddDbContext<GestionContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("GestionConnection")));
 builder.Services.AddScoped<GoalService>();
 builder.Services.AddScoped<AssignmentService>();
 var app = builder.Build();

@@ -4,11 +4,29 @@
         <div class="modal-content">
             <div class="d-flex flex-column justify-content-center mt-4 w-100">
                 <h3 class="text-secondary fw-bold text-center">¿Está seguro?</h3>
-                <p class="text-center">Que desea eliminar el elemento @assignmentName</p>
+                
+                @if (assignments.Count>1)
+                {
+                    <p class="text-center">Que desea eliminar la siguiente lista</p>
+                    <div class="w-100 d-flex justify-content-center">
+                        <div class="card overflow-auto" style="width: 18rem;max-height:10rem;">
+                            <ul class="list-group list-group-flush">
+                                @foreach (var assignment in assignments)
+                                {
+                                    <li class="list-group-item">@assignment.Name</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-center">Que desea eliminar el elemento @assignments.FirstOrDefault()?.Name</p>
+                }
             </div>
             <div class="d-flex justify-content-center gap-2 pt-2 pb-4">
                 <button type="submit" class="btn bg-deep-space-sparkle text-white" @onclick="DeleteData">Aceptar</button>
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" @onclick=CloseModal>Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" @onclick=CloseModal>Cancelar</button>
             </div>
         </div>
     </div>
@@ -23,7 +41,7 @@
     string mensaje = string.Empty;
     private string assignmentName = string.Empty;
     private int id = new();
-
+    List<AssignmentDTO> assignments = new();
     [Parameter]
     public EventCallback OnSave { get; set; }
 
@@ -31,31 +49,33 @@
     {
         try
         {
-            var response = await Http.DeleteAsync($"api/Assignments/{id}");
-
+            var assignmentIds = assignments.Select(a => a.AssignmentId).ToList();
+            var response = await Http.PostAsJsonAsync<List<int>>($"api/Assignments/deletemultiple", assignmentIds); 
             if (response.IsSuccessStatusCode)
             {
                 mensaje = "Asignación eliminada exitosamente.";
                 error = false;
-                showModal = false;
+                showModal = false;  
+                assignments.RemoveRange(0, assignments.Count);
                 await OnSave.InvokeAsync();
             }
             else
             {
                 error = true;
-                mensaje = await response.Content.ReadAsStringAsync();
+                mensaje = await response.Content.ReadAsStringAsync(); 
+                toast.ShowWarning($"Razon:{response.ReasonPhrase}.Codigo de Estado:{response.StatusCode}.{mensaje}");
+                
             }
         }
         catch (Exception ex)
         {
-            // Manejo de excepciones
+            toast.ShowError($"Error:{ex.Message}.{ex.InnerException}");
         }
     }
 
-    public void ShowModal(int idSelected, string assignmentSelected)
+    public void ShowModal(List<AssignmentDTO> listAssignments)
     {
-        assignmentName = assignmentSelected;
-        id = idSelected;
+        assignments = listAssignments; 
         showModal = true;
         StateHasChanged();
     }
@@ -63,6 +83,6 @@
     private void CloseModal()
     {
         showModal = false;
-        assignmentName = string.Empty;
+        assignments = new();
     }
 }

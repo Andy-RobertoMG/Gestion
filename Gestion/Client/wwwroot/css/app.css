@@ -5,12 +5,22 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
-.app{
-    height:100%;
+html{
+    height:100vh;
+    display:flex;
+
 }
-html,body {
-    height: 100vh;
+body {
+    flex-grow: 1;
+    display: flex;
 }
+#app {
+    flex-grow: 1;
+    display: flex;
+    overflow-y:auto;
+    /*height:100vh;*/
+    /*width:100vw;*/
+} 
 h1:focus {
     outline: none;
 }
@@ -54,7 +64,7 @@ a, .btn-link {
     padding: 0.6rem 1.25rem 0.7rem 1.25rem;
     position: fixed;
     width: 100%;
-    z-index: 1000;
+    z-index: 800;
 }
 
     #blazor-error-ui .dismiss {
@@ -121,9 +131,15 @@ a, .btn-link {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1050;
+    z-index: 1;
     width: 100vw;
     height: 100vh;
     background-color: rgb(128, 128, 128);
     background-color: rgba(128, 128, 128, .6); /* Cambia el valor de 0.3 para ajustar la opacidad */
+}
+.selected-row {
+    background-color: #c8dcfc !important;
+}
+.modal{
+    z-index:998;
 }

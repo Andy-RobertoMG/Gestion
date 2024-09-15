@@ -14,14 +14,20 @@ namespace Gestion.Server.Controllers
         public AssignmentsController(AssignmentService assignmentService)
         {
             _assignmentService = assignmentService;
-        }
+        } 
 
-        // GET: api/<AssignmentsController>
-        [HttpGet]
-        public List<AssignmentDTO> Get()
-        {
-            return _assignmentService.GetAssignments();
-        }
+        //[HttpGet("{skip}/{take}")]
+        //public async Task<ActionResult<AssigmentResponse>> Get(int skip,int take)
+        //{
+        //    try
+        //    {
+        //        return Ok(_assignmentService.GetAssignments(skip, take));
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        return BadRequest(ex);
+        //    }
+        //}
 
         // GET api/<AssignmentsController>/5
         [HttpGet("{id}")]
@@ -29,28 +35,37 @@ namespace Gestion.Server.Controllers
         {
             return "value";
         }
-        [HttpGet("byGoal/{id}")]
-        public async Task<IActionResult> GetByGoalId(int id)
+        [HttpGet("byGoal/{id}/{page}/{take}")]
+        public async Task<IActionResult> GetByGoalId(int id,int page, int take, string task = "",DateTime? date = null,string status = "")
         {
             try
             {
-                var result =await _assignmentService.GetByGoalId(id);
-                return Ok(result);
+                return Ok(await _assignmentService.GetAssignments(id,page, take,task,date,status));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex);
             }
         }
-        // GET api/<AssignmentsController>/name/{name}
+        [HttpPut("important")]
+        public async Task<ActionResult> ChangeImportant( [FromBody] AssignmentDTO assignment)
+        {
+            try
+            {
+                await _assignmentService.ChangeImportant(assignment);
+                return Ok();
+            }catch(Exception ex)
+            {
+                return BadRequest();
+            }
+        } 
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetByName(string name)
         {
             var result = await _assignmentService.GetByName(name);
             return Ok(result);
         }
-
-        // POST api/<AssignmentsController>
+         
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] AssigmentUpdateDTO assignment)
         {
@@ -64,8 +79,7 @@ namespace Gestion.Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        // PUT api/<AssignmentsController>/5
+         
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] AssigmentUpdateDTO assignment)
         {
@@ -79,15 +93,27 @@ namespace Gestion.Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        // DELETE api/<AssignmentsController>/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpPut("completeTasks")]
+        public async Task<IActionResult> CompleteTasks(List<int> assignmentsId)
         {
             try
             {
-                await _assignmentService.Delete(id);
-                return Ok();
+                await _assignmentService.CompleteTasks(assignmentsId);
+                return Ok("Tareas completadas exitosamente");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        // DELETE api/<AssignmentsController>/5
+        [HttpPost("deletemultiple")]
+        public async Task<IActionResult> Delete(List<int> assignmentsId)
+        {
+            try
+            {
+                await _assignmentService.Delete(assignmentsId);
+                return Ok("");
             }
             catch (Exception ex)
             {

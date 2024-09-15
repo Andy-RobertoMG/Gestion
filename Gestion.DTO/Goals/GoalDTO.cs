@@ -10,12 +10,13 @@ namespace Gestion.DTO.Goals
     {
         public int GoalId { get; set; }
 
-        public string GoalName { get; set; } = null!;
+        public string Name { get; set; } = null!;
 
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        public int CompletedTasks { get; set; }
+        public int CompletedTasks { get; set; }= 0;
 
-        public int TotalTasks { get; set; }
+        public decimal Percentage { get; set; } = 0;
+        public int TotalTasks { get; set; } = 0; 
     }
 }

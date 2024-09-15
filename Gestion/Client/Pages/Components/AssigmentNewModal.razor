@@ -8,14 +8,14 @@
                     <i class="fs-3 fw-bolder bi bi-x" @onclick=CloseModal></i>
                 </div>
             </div>
-            <EditForm Model="Assignment" OnValidSubmit="SaveData">
+            <EditForm Model="assignment" OnValidSubmit="SaveData">
                 <div class="modal-body">
                     <DataAnnotationsValidator></DataAnnotationsValidator>
                     <div class="d-flex align-items-center gap-2">
                         <label>Nombre:</label>
-                        <InputText @bind-Value="Assignment.AssignmentName" class="form-control"></InputText>
+                        <InputText @bind-Value="assignment.Name" class="form-control"></InputText>
                     </div>
-                    <ValidationMessage For="@(() => Assignment.AssignmentName)" />
+                    <ValidationMessage For="@(() => assignment.Name)" />
                     @if (error)
                     {
                         <p class="m-0 validation-message">@mensaje</p>
@@ -23,7 +23,7 @@
                 </div>
                 <div class="d-flex justify-content-center gap-2 pt-4 pb-4">
                     <button type="submit" class="btn bg-deep-space-sparkle text-white">Aceptar</button>
-                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" @onclick=CloseModal>Cerrar</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" @onclick=CloseModal>Cerrar</button>
                 </div>
             </EditForm>
         </div>
@@ -37,29 +37,31 @@
 @code {
     bool showModal = false, error = false;
     string mensaje;
-    AssigmentUpdateDTO Assignment = new();
+    private AssigmentUpdateDTO assignment = new(); 
     [Parameter]
     public EventCallback OnSave { get; set; }
     private async Task SaveData()
-    {
-
+    { 
         try
         {
-            var response = await Http.PostAsJsonAsync<AssigmentUpdateDTO>("api/Assignments", Assignment);
+            var response = await Http.PostAsJsonAsync<AssigmentUpdateDTO>("api/Assignments", assignment);
 
             if (response.IsSuccessStatusCode)
             {
-                mensaje = "Asignación guardada exitosamente.";
+                mensaje = "Tarea guardada exitosamente.";
                 error = false;
                 showModal = false;
-                Assignment = new();
+                assignment = new();
                 await OnSave.InvokeAsync();
             }
             else
             {
                 error = true;
-                mensaje = await response.Content.ReadAsStringAsync();
-
+                mensaje = await response.Content.ReadAsStringAsync(); 
+                if (!mensaje.Contains("El nombre de la tarea no está disponible."))
+                {
+                    toast.ShowWarning($"Razon:{response.ReasonPhrase}.Codigo de Estado:{response.StatusCode}.{mensaje}");
+                }
             }
         }
         catch (Exception ex)
@@ -67,9 +69,10 @@
             // Manejar la excepción
         }
     }
-    public void ShowModal()
+    public void ShowModal(int id)
     {
         showModal = true;
+        assignment.GoalId = id;
         StateHasChanged();
     }
     private void CloseModal()

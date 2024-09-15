@@ -11,7 +11,7 @@ namespace Gestion.DTO.Goals
     {
         [MaxLength(80,ErrorMessage ="Se tiene permitido hasta 80 caracteres")]
         [Required(ErrorMessage ="El campo es requerido")]
-        public string GoalName { get; set; } = null!;
+        public string Name { get; set; } = null!;
          
     }
 }

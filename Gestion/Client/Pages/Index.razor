@@ -1,132 +1,194 @@
 ﻿@page "/" 
 @inject HttpClient Http
-<PageTitle>Gestion de Mestass</PageTitle> 
-<section class="layout-body">
-    <div class="top bg-white d-flex p-2 border-left-green ">
-        <p class="align-self-center m-0">Control de Metass</p>
-    </div>
-    <div class="left bg-white  p-2" style=" overflow-y: auto;">
+<PageTitle>Gestion de Mestas</PageTitle> 
+<section class="layout-body overflow-auto">
+
+    <div class="left bg-white overflow-auto  p-2">
         <button class="btn text-white d-flex bg-deep-space-sparkle mb-4" @onclick=ShowNewGoalModal>
             <span class="oi oi-plus align-self-center h5  me-1"></span>
             <p class="m-0 align-self-center">Nueva meta</p>
-        </button>
-
-        @foreach (var goal in goalDTO)
+        </button>  
+        @foreach (var goal in goalListDTO)
         {
-            <div class="w-100 goal-item p-1 d-flex " @onclick=@(()=>SelectGoal(goal))>
-                <div class="col-9">
-                    <p class="fw-bold">@goal.GoalName</p>
-                    <p>Fecha creada: @goal.CreatedDate.ToString("dd/MM/yyyy")</p>
-                </div>
-                <div class="col-3 d-flex gap-2 justify-content-end">
-                    <span class="fs-4 bi bi-pencil-fill text-black-50" @onclick="@(()=>SelectUpdateGoal(goal.GoalId,goal.GoalName))"></span>
-                    <i class="fs-4 bi bi-trash-fill text-black-50" @onclick="@(()=>SelectDeleteGoal(goal.GoalId,goal.GoalName))"></i>
-                </div>
+            <div class="w-100 goal-item p-1 d-flex flex-column">
+                <div class="w-100 p-1 d-flex " @onclick=@(()=>SelectGoal(goal))>
+                    <div class="col-xxl-9 col-xl-9 ">
+                        <p class="fw-bold">@goal.Name</p>
+                        <p>Fecha creada: @goal.CreatedDate.ToString("dd/MM/yyyy")</p>
+                    </div>
+                    <div class="col-3 d-flex gap-2 justify-content-end">
+                        <span class="fs-4 bi bi-pencil-fill text-black-50" @onclick="@(()=>SelectUpdateGoal(goal.GoalId,goal.Name))"></span>
+                        <i class="fs-4 bi bi-trash-fill text-black-50" @onclick="@(()=>SelectDeleteGoal(goal.GoalId,goal.Name))"></i>
+                    </div>
 
+                </div>
+                <div class="w-100 p-1 d-flex flex-column">
+                    <div class="d-flex justify-content-between">
+                        <p class="m-0">Tareas completadas @goal.CompletedTasks/@goal.TotalTasks</p>
+                        <p class="m-0">@goal.Percentage%</p>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: @goal.Percentage%" aria-valuenow="@goal.Percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
             </div>
         }
     </div>
-    <div class="right bg-white">
+
+    <div class="top bg-white d-flex p-2 border-left-green ">
+        <p class="align-self-center m-0">Control de Metas</p>
+    </div>
+    <div class="right bg-white overflow-auto">
         <div class="w-100 bg-deep-space-sparkle ps-2 pt-2 pb-2">
-            <p class="text-white fw-bold align-self-center m-0" style="min-height:1rem;">@goalSelected.GoalName</p>  
+            <p class="text-white fw-bold align-self-center m-0" style="min-height:1rem;">@goalSelected.Name</p>  
         </div>
-        <div class="m-3">
-            <div class="border-green border-bottom-0 p-2 gap-2 d-flex justify-content-start">
+        <div class="m-3 overflow-auto">
+            <div class="border-green border-bottom-0 p-2 overflow-auto gap-2 d-flex justify-content-start">
                 <button class="btn text-white d-flex bg-deep-space-sparkle" @onclick="SelectNewAssigment">
                     <span class="oi oi-plus m-0 align-self-center me-1"></span>
                     <p class="m-0 align-self-center">Agregar tarea</p>
                 </button>
-                <button class="btn text-white d-flex bg-deep-space-sparkle">
-                    <span class="fs-4 bi bi-check-circle m-0 align-self-center me-1"></span>
-                    <p class="m-0 align-self-center">Completar tarea</p>
-                </button>
-                <button class="btn text-white d-flex bg-deep-space-sparkle">
-                    <span class="fs-4 bi bi-pencil-fill m-0 align-self-center me-1"></span>
-                    <p class="m-0 align-self-center">Editar</p>
-                </button>
-                <button class="btn text-white d-flex bg-deep-space-sparkle">
-                    <span class="fs-4 bi bi-trash-fill m-0 align-self-center me-1"></span>
-                    <p class="m-0 align-self-center">Eliminar</p>
-                </button>
+                @if (idListSelAssigment.Count > 0)
+                {
+                    <button class="btn text-white d-flex bg-deep-space-sparkle" @onclick=@CompleteTaskAssinments>
+                        <span class="fs-4 bi bi-check-circle m-0 align-self-center me-1"></span>
+                        <p class="m-0 align-self-center">Completar tarea</p>
+                    </button>
+                }
+                @if (selectedAssignment.AssignmentId!=0&&idListSelAssigment.Count==1)
+                {
+                    <button class="btn text-white d-flex bg-deep-space-sparkle" @onclick=@SelectedUpdateAssigment>
+                        <span class="fs-4 bi bi-pencil-fill m-0 align-self-center me-1"></span>
+                        <p class="m-0 align-self-center" >Editar</p>
+                    </button>
+                }
+                @if (idListSelAssigment.Count > 0)
+                {
+                    <button class="btn text-white d-flex bg-deep-space-sparkle" @onclick=@DeleteAssigments>
+                        <span class="fs-4 bi bi-trash-fill m-0 align-self-center me-1"></span>
+                        <p class="m-0 align-self-center">Eliminar</p>
+                    </button>
+                }
+                
             </div>
             <div class="table-responsive">
                 <table class="table alternate-rows table-body-color table-bordered m-0">
                     <thead class="table-light table-head-border-color ">
                         <tr class="header-color header-body">
-                            <th scope="col"><input type="checkbox"></th>
+                            <th scope="col"><InputCheckbox @bind-Value=@selectAll @bind-Value:after=SelectAllRows></InputCheckbox></th>
                             <th></th>
-                            <th scope="col">Tarea <input type="text" class="form-control form-control-sm mt-1" placeholder=""></th>
-                            <th scope="col">Fecha <input type="datetime" class="form-control form-control-sm mt-1" ></th>
-                            <th scope="col">Estado <input type="text" class="form-control form-control-sm mt-1" placeholder=""></th>
+                            <th scope="col">Tarea <input @bind-value="taskInput" @onkeydown=@((e)=>UpdateFilterTask(e,"task")) @bind-value:event="oninput" class="form-control form-control-sm mt-1"></input> </th>
+                            <th scope="col">Fecha <input @bind-value="dateInput" type="date" @onkeydown=@((e)=>UpdateFilterTask(e,"date")) @bind-value:event="oninput" class="form-control form-control-sm mt-1"></input></th>
+                            <th scope="col">Estado <input @bind-value="statusInput" @onkeydown=@((e)=>UpdateFilterTask(e,"status")) @bind-value:event="oninput" class="form-control form-control-sm mt-1"></input> </th>
                         </tr>
                     </thead>
                     <tbody class="tbody-border-color">
-                        @foreach (var assigment in assigmentDTO)
+                        @foreach (var assigment in assigmentsListDTO)
                         {
-                            <tr>
-                                <td><input type="checkbox" value="(@(idSelAssigment.Contains(assigment.AssignmentId))" ></td>
-                                <td><i class="bi bi-star star-icon-gray"></i></td>
-                                <td> @assigment.AssignmentName</td>
+                            <tr class="@(CompareAssigments(assigment)?" selected-row":"")">
+                                <td><input type="checkbox" @onclick=@(()=>SelectAssigmnet(assigment)) checked="@(CompareAssigments(assigment)?true:false)"></td>
+                                <td><i class="bi @((assigment.IsImportant)?"bi-star-fill star-icon":"bi-star star-icon-gray")  " @onclick=@(()=>ChangeImportantRow(assigment))></i></td>
+                                <td> @assigment.Name</td>
                                 <td>@assigment.CreatedDate.ToString("dd/MM/yyyy")</td>
                                 <td class="status-open">@assigment.AssignmentStatus</td>
                             </tr>
-                        } 
+                        }  
                         
                     </tbody>
+
                 </table>
-            </div>
+            </div> 
             <div class="d-flex justify-content-between border-green border-top-0 ps-1 pe-1 ">
-                <div class="fs-5 gap-1 d-flex align-content-center ">
-                    <i class="bi bi-skip-start-fill d-flex align-items-center"></i>
-                    <i class="bi bi-caret-left-fill d-flex align-items-center"></i>
-                    <div class="bg-deep-space-sparkle text-white d-flex justify-content-center align-items-center" style="width:2rem;height:2rem;">
-                        1
-                    </div>
-                    <i class="bi bi-caret-right-fill d-flex align-items-center"></i>
-                    <i class="bi bi-skip-end-fill d-flex align-items-center"></i>
-                </div>
-                <div class="d-flex align-items-center me-3">1-2 de 2 registros</div>
+                <Pagination ActualPage="actualPage" TotalItems="Count" Take="take" TotalsPage="totalPages" PaginaSeleccionada="LoadPagination" />
             </div>
         </div>
     </div>
 </section>
-<NewGoalModal @ref="newGoalModal" OnSave="LoadGoalData"/>
-<UpdateGoalModal @ref="updateGoalModal"  OnSave="LoadGoalData"/>
-<DeleteGoalModal @ref="deleteGoalModal" OnSave="LoadGoalData"/>
+<GoalNewModal @ref="newGoalModal" OnSave="LoadGoalData" />
+<GoalUpdateModal @ref="updateGoalModal" OnSave="LoadGoalData" />
+<GoalDeleteModal @ref="deleteGoalModal" OnSave="LoadGoalData" />
 <AssigmentNewModal @ref="assigmentNewModal" OnSave="LoadGoalAssignment" />
+<AssigmentDeleteModal @ref="assigmentDeleteModal" OnSave="LoadGoalAssignment" />
+<AssigmentUpdateModal @ref="assigmentUpdateModal" OnSave="LoadGoalAssignment" />
 @code{
-    NewGoalModal newGoalModal = new();
-    UpdateGoalModal updateGoalModal = new();
-    DeleteGoalModal deleteGoalModal = new();
+    //ModalComponents
+    GoalNewModal newGoalModal = new();
+    GoalUpdateModal updateGoalModal = new();
+    GoalDeleteModal deleteGoalModal = new();
     AssigmentNewModal assigmentNewModal = new();
-    GoalDTO goalSelected = new();
-    List<GoalDTO> goalDTO = new();
-    List<AssignmentDTO> assigmentDTO = new();
-    bool showBackDrop = false,showModifyModal =false,errorUpdate= false;
-    GoalUpdateDTO selectedGoal = new();
-
-    int idSel = 0;
-    List<int> idSelAssigment = new();
-    string mensaje = "";
+    AssigmentDeleteModal assigmentDeleteModal = new();
+    AssigmentUpdateModal assigmentUpdateModal = new();
+    //Filas seleccionadas
+    GoalDTO goalSelected = new(); 
+    AssignmentDTO selectedAssignment = new();
+    List<AssignmentDTO> idListSelAssigment = new();
+    //Listas
+    List<GoalDTO> goalListDTO = new();
+    List<AssignmentDTO> assigmentsListDTO = new();   
+    //Pagination
+    int actualPage = 1, totalPages = 0, Count = 0, take = 6;
+    //Filters Tasks,Date,Status
+    string task = string.Empty,status= string.Empty,taskInput=string.Empty,statusInput=string.Empty;
+    DateTime? date = null,dateInput=null;
+    //Select Input
+    bool selectAll = false; 
     protected override async Task OnInitializedAsync()
     {
+
         await LoadGoalData();
+
     }
     private async Task LoadGoalData()
     {
         var response = await Http.GetAsync("api/Goals");
         if (response.IsSuccessStatusCode)
         {
-            goalDTO = await response.Content.ReadFromJsonAsync<List<GoalDTO>>() ?? new();
+            goalListDTO = await response.Content.ReadFromJsonAsync<List<GoalDTO>>() ?? new();
         }
     } 
     private async Task LoadAssigmentData(int id)
     {
-        var response = await Http.GetAsync($"api/Assignments/byGoal/{id}");
+
+        var response = await Http.GetAsync($"api/Assignments/byGoal/{id}/{actualPage}/{take}?task={task}&date={date?.ToString("yyyy-MM-dd")}&status={status}");
         if (response.IsSuccessStatusCode)
-        {
-            assigmentDTO = await response.Content.ReadFromJsonAsync<List<AssignmentDTO>>() ?? new();
+        { 
+            var result = await response.Content.ReadFromJsonAsync<AssigmentResponse>();
+            assigmentsListDTO = result.Assignments;
+            totalPages = result.Pages;
+            Count = result.Count;
+            actualPage = result.ActualPage;
+            //Si la lista de seleccionados es el mismo que los elementos mostrados en la tabla se marca que todos las filas estan seleccionadas con el checkbox
+            selectAll = CheckSelectedTasks();
         }
+        else
+        {
+
+        }
+    }
+    private async Task UpdateFilterTask(KeyboardEventArgs e,string filter)
+    {
+        if (e.Key == "Enter")
+        {
+
+            if (filter == "task")
+            {
+                task = taskInput; 
+            }
+            if(filter == "status")
+            {
+                status = statusInput;
+            }
+            if (filter == "date")
+            {
+                date = dateInput;
+            }
+            await LoadAssigmentData(goalSelected.GoalId);
+        }
+    }
+    private async Task LoadPagination(int page)
+    {
+        actualPage = page;
+        await LoadAssigmentData(goalSelected.GoalId);
     }
     private async Task LoadGoalAssignment()
     {
@@ -138,7 +200,7 @@
         newGoalModal.ShowModal();
     }
     private void SelectUpdateGoal(int id,string name)
-    {
+    { 
         updateGoalModal.ShowModal(id,name);
     }
     private void SelectDeleteGoal(int id,string name)
@@ -147,16 +209,125 @@
     }
     private void SelectNewAssigment()
     {
-        assigmentNewModal.ShowModal();
+        assigmentNewModal.ShowModal(goalSelected.GoalId);
+    }
+    private void SelectAssigmnet(AssignmentDTO assignment)
+    {
+        var existingAssignment = idListSelAssigment.FirstOrDefault(a => a.AssignmentId == assignment.AssignmentId);
+
+        if (existingAssignment != null)
+        {
+            idListSelAssigment.Remove(existingAssignment);
+        }
+        else
+        {
+            idListSelAssigment.Add(assignment);
+        }
+        selectedAssignment = assignment;
+        selectAll = CheckSelectedTasks();
+    }
+    private bool CompareAssigments(AssignmentDTO assignment)
+    {
+        var existingAssignment = idListSelAssigment.FirstOrDefault(a => a.AssignmentId == assignment.AssignmentId);
+
+        return (existingAssignment != null) ? true : false;
+    }
+    private void SelectedUpdateAssigment()
+    {
+        assigmentUpdateModal.ShowModal(selectedAssignment.AssignmentId, selectedAssignment.Name); 
+    }
+    private void DeleteAssigments()
+    {
+        assigmentDeleteModal.ShowModal(idListSelAssigment);
+    } 
+    private async Task CompleteTaskAssinments()
+    {
+        try
+        {
+            var assignmentIds = idListSelAssigment.Select(a => a.AssignmentId).ToList();
+            var response = await Http.PutAsJsonAsync<List<int>>($"api/Assignments/completeTasks/", assignmentIds);
+            if (response.IsSuccessStatusCode)
+            {
+                string mensaje = string.Empty;
+                mensaje = await response.Content.ReadAsStringAsync();
+                toast.ShowSuccess(mensaje);
+                await LoadGoalAssignment();
+            }
+        }catch(Exception ex)
+        {
+            toast.ShowError($"Error:{ex.Message}.{ex.InnerException}");
+        }
     }
     private async Task SelectGoal(GoalDTO goal){
         try
         {
+            bool sameId = goal.GoalId == goalSelected.GoalId;
             goalSelected = goal;
-            await LoadAssigmentData(goalSelected.GoalId);
+            if (!sameId)
+            {
+                selectedAssignment = new();
+                idListSelAssigment.RemoveRange(0,idListSelAssigment.Count);
+                actualPage = 1;
+                StateHasChanged();
+                await LoadAssigmentData(goalSelected.GoalId);
+            }
+
         }catch(Exception ex)
         {
-            
+            toast.ShowError($"Error:{ex.Message}.{ex.InnerException}");
         }
+    }
+    private async Task ChangeImportantRow(AssignmentDTO assignment)
+    {
+        try
+        {
+            assignment.IsImportant = !assignment.IsImportant;
+            var response =await Http.PutAsJsonAsync<AssignmentDTO>($"api/Assignments/important/", assignment);
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadAssigmentData(goalSelected.GoalId);
+            }
+        }catch(Exception ex)
+        {
+            toast.ShowError($"Error:{ex.Message}.{ex.InnerException}");
+        }
+    }
+    private bool CheckSelectedTasks()
+    {
+        var assigmentsIds = assigmentsListDTO.Select(a => a.AssignmentId).ToList();
+        var selectedIds = idListSelAssigment.Select(a => a.AssignmentId).ToList();
+        return assigmentsIds.All(id => selectedIds.Contains(id));
+    }
+    private async Task SelectAllRows()
+    {
+        if (selectAll)
+        { 
+            foreach (var assignment in assigmentsListDTO)
+            {
+                // Verifica si el AssignmentId ya está en idListSelAssigment
+                bool exists = idListSelAssigment.Any(a => a.AssignmentId == assignment.AssignmentId);
+
+                if (!exists)
+                {
+                    // Si no existe, se agrega el assignment a idListSelAssigment
+                    idListSelAssigment.Add(assignment);
+                }
+            }
+        }
+        else
+        {
+            foreach (var assignment in assigmentsListDTO)
+            {
+                // Verifica si el AssignmentId ya está en idListSelAssigment
+                var exists = idListSelAssigment.FirstOrDefault(a => a.AssignmentId == assignment.AssignmentId);
+
+                if (exists!=null)
+                {
+                    // Si no existe, se agrega el assignment a idListSelAssigment
+                    idListSelAssigment.Remove(exists);
+                }
+            }
+        }
+
     }
 }

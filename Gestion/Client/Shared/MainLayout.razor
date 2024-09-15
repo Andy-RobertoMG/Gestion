@@ -1,12 +1,30 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="layout bg-platinum">
-    <div class="header bg-white" style="box-shadow: 0 8px 6px -2px rgba(0, 0, 0, .3);">1</div>
-    <div class="sidebar bg-deep-space-sparkle" >
-        <NavMenu/>
+<div class="layout @sidebar bg-platinum overflow-auto ">
+    <div class="header d-flex align-items-center justify-content-end ps-3 pe-3 bg-white" style="box-shadow: 0 8px 6px -2px rgba(0, 0, 0, .3);"> 
+        <i class="fs-1 bi bi-list text-black button-nav" @onclick="OpenSidebar"></i>
     </div>
-    <main class="body d-flex p-2 pt-3" >
+    <div class="sidebar @sidebar bg-deep-space-sparkle overflow-auto" >
+        <NavMenu />
+    </div>
+    @* <div class="sidebarMin @sidebar bg-deep-space-sparkle overflow-auto">
+        <NavMenu />
+    </div> *@
+    <main class="body d-flex flex-column overflow-auto p-2 pt-3"> 
         @Body
     </main>
 </div>
-<BlazoredToasts Timeout="10"/>
+<BlazoredToasts Timeout="10" />
+@code{
+    string sidebar = "";
+    private void OpenSidebar(){
+        if (string.IsNullOrEmpty(sidebar))
+        {
+            sidebar = "show";
+        }
+        else
+        {
+            sidebar = "";
+        }
+    }
+}

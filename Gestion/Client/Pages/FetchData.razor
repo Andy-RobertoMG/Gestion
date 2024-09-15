@@ -1,47 +1,41 @@
-﻿@page "/fetchdata"
-@using Gestion.Shared
-@inject HttpClient Http
-
-<PageTitle>Weather forecast</PageTitle>
-
-<h1>Weather forecast</h1>
-
-<p>This component demonstrates fetching data from the server.</p>
-
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Dates</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-
-@code {
-    private WeatherForecast[]? forecasts;
-
-    protected override async Task OnInitializedAsync()
-    {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
-    }
-}
+﻿@page "/fetch"
+<section class="layout-body overflow-auto">
+    <div class="top bg-white d-flex p-2 border-left-green ">
+        <p class="align-self-center m-0">Control de Metass</p>
+    </div>
+    <div class="left bg-white overflow-auto  p-2">
+    </div>
+    <div class="right bg-white overflow-auto"><NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+        <NavMenu />
+    </div>
+</section>

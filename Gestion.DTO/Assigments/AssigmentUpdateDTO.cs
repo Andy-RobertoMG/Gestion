@@ -11,6 +11,7 @@ namespace Gestion.DTO.Assigments
     {
         [MaxLength(80, ErrorMessage = "Se tiene permitido hasta 80 caracteres")]
         [Required(ErrorMessage = "El campo es requerido")] 
-        public string AssignmentName { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public int GoalId { get; set; } = 0;
     }
 }

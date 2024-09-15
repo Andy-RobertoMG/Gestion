@@ -8,7 +8,7 @@
             </div> 
             <div class="d-flex justify-content-center gap-2 pt-2 pb-4">
                 <button type="submit" class="btn bg-deep-space-sparkle text-white" @onclick="DeleteData">Aceptar</button>
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" @onclick=CloseModal>Cancelar</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" @onclick=CloseModal>Cancelar</button>
             </div>
         </div>
 
@@ -41,16 +41,18 @@
                 error = false;
                 showModal = false; 
                 await OnSave.InvokeAsync();
+                toast.ShowSuccess("Eliminado Exitosamente.");
             }
             else
             {
                 error = true;
                 mensaje = await response.Content.ReadAsStringAsync();
+                toast.ShowWarning(mensaje); 
             }
         }
         catch (Exception ex)
         {
-
+            toast.ShowError($"Error:{ex.Message}.{ex.InnerException}");
         }
     }
     public void ShowModal(int idSelected, string goalSelected)
