@@ -3,7 +3,7 @@
 ## Acceso a la Aplicación
 
 La aplicación está disponible en el siguiente enlace:
-[https://neitek.azurewebsites.net/](https://neitek.azurewebsites.net/)
+[https://neitekgestion.azurewebsites.net/](https://neitekgestion.azurewebsites.net/)
 
 ## Preparación de la Base de Datos
 
