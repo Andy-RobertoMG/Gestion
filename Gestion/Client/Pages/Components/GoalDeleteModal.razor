@@ -26,7 +26,7 @@
     private int id = new();
 
     [Parameter]
-    public EventCallback OnSave { get; set; }
+    public EventCallback<int> OnSave { get; set; }
 
     private async Task DeleteData()
     {
@@ -40,7 +40,7 @@
                 mensaje = "Usuario guardado exitosamente.";
                 error = false;
                 showModal = false; 
-                await OnSave.InvokeAsync();
+                await OnSave.InvokeAsync(id);
                 toast.ShowSuccess("Eliminado Exitosamente.");
             }
             else

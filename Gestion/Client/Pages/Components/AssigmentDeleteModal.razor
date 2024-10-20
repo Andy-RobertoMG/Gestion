@@ -34,8 +34,7 @@
 @if (showModal)
 {
     <div class="modal-backdrop-modified fade show"></div>
-}
-
+} 
 @code {
     bool showModal = false, error = false;
     string mensaje = string.Empty;
@@ -43,13 +42,15 @@
     private int id = new();
     List<AssignmentDTO> assignments = new();
     [Parameter]
-    public EventCallback OnSave { get; set; }
+    public EventCallback<int> OnSave { get; set; }
 
     private async Task DeleteData()
     {
         try
         {
+            int goalId = 0;
             var assignmentIds = assignments.Select(a => a.AssignmentId).ToList();
+            goalId=assignments.First().GoalId??0;
             var response = await Http.PostAsJsonAsync<List<int>>($"api/Assignments/deletemultiple", assignmentIds); 
             if (response.IsSuccessStatusCode)
             {
@@ -57,7 +58,7 @@
                 error = false;
                 showModal = false;  
                 assignments.RemoveRange(0, assignments.Count);
-                await OnSave.InvokeAsync();
+                await OnSave.InvokeAsync(goalId);
             }
             else
             {

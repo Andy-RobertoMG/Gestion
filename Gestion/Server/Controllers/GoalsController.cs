@@ -25,9 +25,14 @@ namespace Gestion.Server.Controllers
 
         // GET api/<GoalsController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return "value";
+            var goal =await _goalService.GetById(id);
+            if (goal == null)
+            {
+                return NotFound();
+            }
+            return Ok(goal);
         }
         [HttpGet("name/{name}")]
         public IActionResult Get(string name)
@@ -71,7 +76,7 @@ namespace Gestion.Server.Controllers
         {
             try
             {
-                await _goalService.Delete(id); 
+                await _goalService.Delete(id);  
                 return Ok();
             }
             catch(Exception ex)

@@ -75,3 +75,6 @@
 .goal-item:nth-child(even) {
     background-color: var(--platinum); /* bg-platinum */
 }
+.goal-item:hover{
+    cursor:pointer;
+}

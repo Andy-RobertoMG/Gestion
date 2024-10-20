@@ -1,5 +1,5 @@
 ﻿@inject HttpClient Http
-<div class="modal fade  show @(showModal?"show d-block":"")" id="goalCreate" tabindex="-1" aria-labelledby="goalModalLabel" aria-hidden="true">
+<div class="modal fade show @(showModal?"show d-block":"")" id="goalCreate" tabindex="-1" aria-labelledby="goalModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-deep-space-sparkle text-white d-flex justify-content-between">
@@ -34,7 +34,7 @@
     <div class="modal-backdrop-modified fade show"></div>
 }
 
-@code {
+@code { 
     bool showModal = false, error = false; 
     string mensaje;
     GoalUpdateDTO Goal = new();

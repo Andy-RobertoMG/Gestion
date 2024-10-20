@@ -1,43 +1,98 @@
 ﻿@page "/" 
 @inject HttpClient Http
-<PageTitle>Gestion de Mestas</PageTitle> 
+@using System.Net;
+@attribute [StreamRendering]
+<PageTitle>Gestion de Metas</PageTitle> 
 <section class="layout-body overflow-auto">
 
     <div class="left bg-white overflow-auto  p-2">
         <button class="btn text-white d-flex bg-deep-space-sparkle mb-4" @onclick=ShowNewGoalModal>
             <span class="oi oi-plus align-self-center h5  me-1"></span>
-            <p class="m-0 align-self-center">Nueva meta</p>
-        </button>  
-        @foreach (var goal in goalListDTO)
+            <p class="m-0 align-self-center">Nueva meta  </p>
+        </button>
+        @if (loading)
         {
-            <div class="w-100 goal-item p-1 d-flex flex-column">
-                <div class="w-100 p-1 d-flex " @onclick=@(()=>SelectGoal(goal))>
-                    <div class="col-xxl-9 col-xl-9 ">
-                        <p class="fw-bold">@goal.Name</p>
-                        <p>Fecha creada: @goal.CreatedDate.ToString("dd/MM/yyyy")</p>
-                    </div>
-                    <div class="col-3 d-flex gap-2 justify-content-end">
-                        <span class="fs-4 bi bi-pencil-fill text-black-50" @onclick="@(()=>SelectUpdateGoal(goal.GoalId,goal.Name))"></span>
-                        <i class="fs-4 bi bi-trash-fill text-black-50" @onclick="@(()=>SelectDeleteGoal(goal.GoalId,goal.Name))"></i>
-                    </div>
+            @for (int i = 0; i < 3; i++)
+            {
+                <div class="w-100  p-1 d-flex flex-column position-relative ">
+                    <div class="w-100 p-1 d-flex ">
+                        <div class="col-xxl-9 col-xl-9 ">
+                            <p class="fw-bold placeholder-glow">
+                                <span class="placeholder col-11"></span>
+                            </p>
+                            <p class="placeholder-glow">
+                                <span class="placeholder col-9"></span>
+                            </p>
+                        </div>
+                        <div class="col-3 d-flex gap-2">
+                            <p class="placeholder-glow w-100 text-end">
+                                <span class="placeholder col-9 "></span>
+                            </p>
+                        </div>
 
-                </div>
-                <div class="w-100 p-1 d-flex flex-column">
-                    <div class="d-flex justify-content-between">
-                        <p class="m-0">Tareas completadas @goal.CompletedTasks/@goal.TotalTasks</p>
-                        <p class="m-0">@goal.Percentage%</p>
                     </div>
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: @goal.Percentage.ToString("0.00")%" aria-valuenow="@goal.Percentage.ToString("0.00")" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="w-100 p-1 d-flex">
+                        <div class="col-8">
+                            <p class="m-0 w-100 placeholder-glow">
+                                <span class="placeholder col-7"></span>
+                                <span class="placeholder col-4"></span>
+                            </p>
+
+                        </div>
+                        <div class="col-4">
+                            <p class="m-0 placeholder-glow text-end ">
+                                <span class="placeholder col-5"></span>
+                            </p>
+                        </div>
+                        @* <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: @goal.Percentage.ToString("0.00")%" aria-valuenow="@goal.Percentage.ToString("0.00")" aria-valuemin="0" aria-valuemax="100"></div>
+                </div> *@
                     </div>
+                    
                 </div>
-            </div>
+
+            }
+        }
+        @if (!loading)
+        {
+            @foreach (var goal in goalListDTO)
+            {
+                <div class="w-100 goal-item p-1 d-flex flex-column position-relative" @onclick=@(()=>SelectGoal(goal))>
+                    <div class="w-100 p-1 d-flex ">
+                        <div class="col-xxl-9 col-xl-9 ">
+                            <p class="fw-bold">@goal.Name</p>
+                            <p>Fecha creada: @goal.CreatedDate.ToString("dd/MM/yyyy")</p>
+                        </div>
+                        <div class="col-3 d-flex gap-2 justify-content-end">
+                            <span class="fs-4 bi bi-pencil-fill text-black-50" @onclick="@(()=>SelectUpdateGoal(goal.GoalId,goal.Name))"></span>
+                            <i class="fs-4 bi bi-trash-fill text-black-50" @onclick="@(()=>SelectDeleteGoal(goal.GoalId,goal.Name))"></i>
+                        </div> 
+                    </div>
+                    <div class="w-100 p-1 d-flex flex-column">
+                        <div class="d-flex justify-content-between">
+                            <p class="m-0">Tareas completadas @goal.CompletedTasks/@goal.TotalTasks</p>
+                            <p class="m-0">@goal.Percentage%</p>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: @goal.Percentage.ToString("0.00")%" aria-valuenow="@goal.Percentage.ToString("0.00")" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    @if(loadingGoal&&goalIdLoading==goal.GoalId){
+                        <div class="w-100 h-100 justify-content-center align-items-center d-flex position-absolute ">
+                            <div class="spinner-border position-absolute ali " role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         }
     </div>
 
     <div class="top bg-white d-flex p-2 border-left-green ">
         <p class="align-self-center m-0">Control de Metas</p>
     </div>
+
     <div class="right bg-white overflow-auto">
         <div class="w-100 bg-deep-space-sparkle ps-2 pt-2 pb-2">
             <p class="text-white fw-bold align-self-center m-0" style="min-height:1rem;">@goalSelected.Name</p>  
@@ -106,9 +161,9 @@
 </section>
 <GoalNewModal @ref="newGoalModal" OnSave="LoadGoalData" />
 <GoalUpdateModal @ref="updateGoalModal" OnSave="LoadGoalData" />
-<GoalDeleteModal @ref="deleteGoalModal" OnSave="LoadGoalData" />
+<GoalDeleteModal @ref="deleteGoalModal" OnSave="LoadGoalAndAssigmentData" />
 <AssigmentNewModal @ref="assigmentNewModal" OnSave="LoadGoalAssignment" />
-<AssigmentDeleteModal @ref="assigmentDeleteModal" OnSave="LoadGoalAssignment" />
+<AssigmentDeleteModal @ref="assigmentDeleteModal" OnSave="LoadGoalAndAssigmentData" />
 <AssigmentUpdateModal @ref="assigmentUpdateModal" OnSave="LoadGoalAssignment" />
 @code{
     //ModalComponents
@@ -131,12 +186,63 @@
     string task = string.Empty,status= string.Empty,taskInput=string.Empty,statusInput=string.Empty;
     DateTime? date = null,dateInput=null;
     //Select Input
-    bool selectAll = false; 
+    bool selectAll = false;
+    //Loaders 
+    int goalIdLoading = 0;
+    bool loading = true, loadingTable = false, loadingGoal = false ; 
     protected override async Task OnInitializedAsync()
     {
 
         await LoadGoalData();
-
+        var _goal =goalListDTO.FirstOrDefault();
+        if(_goal != null)
+        {
+            goalSelected = _goal;
+            await LoadAssigmentData(_goal.GoalId);
+        } 
+        loading = false;
+    }
+    private async Task LoadGoalAndAssigmentData(int goalId)
+    {
+        goalIdLoading = goalId;
+        loadingGoal = true;
+        try
+        {
+            var response = await Http.GetAsync($"api/Goals/{goalId}");
+            await LoadAssigmentData(goalId);
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                // Manejar el caso cuando no hay contenido (NoContent - 204)
+                var goalFound = goalListDTO.SingleOrDefault(x => x.GoalId == goalId);
+                if (goalFound != null)
+                {
+                    goalListDTO.Remove(goalFound);
+                }
+            }
+            if (response.IsSuccessStatusCode)
+            {
+                
+                // Leer el contenido cuando no sea NoContent
+                var goal = await response.Content.ReadFromJsonAsync<GoalDTO>();
+                if (goal != null)
+                {
+                    var index = goalListDTO.FindIndex(x => x.GoalId == goal.GoalId);
+                    if (index != -1)
+                    {
+                        goalListDTO[index] = goal;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+        finally
+        {
+            loadingGoal = false;
+            goalIdLoading = 0;
+        } 
     }
     private async Task LoadGoalData()
     {
@@ -144,6 +250,7 @@
         if (response.IsSuccessStatusCode)
         {
             goalListDTO = await response.Content.ReadFromJsonAsync<List<GoalDTO>>() ?? new();
+            
         }
     } 
     private async Task LoadAssigmentData(int id)

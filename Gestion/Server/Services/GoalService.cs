@@ -27,7 +27,22 @@ public class GoalService
         })
         .ToList(); 
     }
-
+    public async Task<GoalDTO?> GetById(int id)
+    { 
+        var goal = await _context.Goals.FirstOrDefaultAsync(g=>g.GoalId == id);
+        if (goal != null) {
+            return new GoalDTO
+            {
+                GoalId = goal.GoalId,
+                Name = goal.GoalName,
+                CreatedDate = goal.CreatedDate,
+                CompletedTasks = goal.CompletedTasks,
+                TotalTasks = goal.TotalTasks,
+                Percentage = goal.Percentage,
+            };
+        }
+        return null; 
+    }
     public async Task<GoalDTO> GetByName(string name) 
     {
         var goal= await _context.Goals.FirstOrDefaultAsync(g => g.GoalName == name);
@@ -88,11 +103,13 @@ public class GoalService
         {
             throw new Exception("El objetivo no existe.");
         }
-        var hasAssignments = await _context.Assignments.AnyAsync(a => a.GoalId == goalId);
-        if (hasAssignments)
-        {
-            throw new Exception("No se puede eliminar la meta porque tiene tareas asignadas.");
-        } 
+        var _assigments = _context.Assignments.Where(x => x.GoalId == goalId).ToList();
+        _context.RemoveRange(_assigments);
+        //var hasAssignments = await _context.Assignments.AnyAsync(a => a.GoalId == goalId);
+        //if (hasAssignments)
+        //{
+        //    throw new Exception("No se puede eliminar la meta porque tiene tareas asignadas.");
+        //} 
         _context.Goals.Remove(goal);
         await _context.SaveChangesAsync();
     }
